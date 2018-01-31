@@ -1,0 +1,31 @@
+{
+    "title": "大众版项目说明",
+    "author": "BoPo",	
+    "plugins": [
+        "todo",
+        "js-sequence-diagram-full@>=0.3.1",
+        "toggle-chapters",
+        "tbfed-pagefooter",
+        "include-codeblock",
+        "image-captions",
+        "splitter",
+        "new-flowchart"
+    ],
+    "pluginsConfig": {
+        "image-captions": {
+          "caption": "Image - _CAPTION_"
+        },
+        "github": {
+            "url": "https://github.com/bopo"
+        },
+        "simple-page-toc": {
+            "maxDepth": 3,
+            "skipFirstH1": true
+        },        
+        "tbfed-pagefooter": {
+            "copyright":"&copy Bankeys Team",
+            "modify_label": "该文件修订时间：",
+            "modify_format": "YYYY-MM-DD HH:mm:ss"
+        }   
+    }
+}

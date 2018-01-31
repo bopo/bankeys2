@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta content="视频对接">
+    <title>视频对接</title>
+
+
+    <script type="text/javascript" src="{% static '/video/js/jquery-1.9.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static '/video/js/main.js' %}"></script>
+    <script type="text/javascript" src="{% static '/video/js/videocall.js' %}"></script>
+
+    <script type="text/javascript" src="{% static '/video/js/anychat4html5.min.js' %}"></script>
+    <script type="text/javascript" src="{% static '/video/js/anychatevent.js' %}"></script>
+    <script type="text/javascript" src="{% static '/video/js/anychatobject.js' %}"></script>
+    <script type="text/javascript" src="{% static '/video/js/anychatsdk.js' %}"></script>
+    <link rel="stylesheet" href="{% static '/video/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static '/video/css/style.css' %}">
+
+
+</head>
+<body>
+
+
+<h2 class="rztitle">当前认证用户</h2>
+<hr class="hr0">
+<div class="container">
+    <ul id="userBox" class="col-md-12">
+        <!--        <li class="col-md-5">
+                    <img class="userPoto" src="img/14142354.jpg" alt="user">
+                    <div class="rig">
+                        <p>
+                            <span>证件号码：</span><span>333</span>
+                        </p>
+                        <p>
+                            <span>用户名：</span><span>222</span>
+                        </p>
+                        <p>
+                            <span>接待客服：</span><span>111</span>
+                        </p>
+                        <br>
+                        <button class="btn btn-default">旁听</button>
+                        <button class="btn btn-default btn-on">接入</button>
+                    </div>
+                </li>
+                <li class="col-md-5">
+                    <img class="userPoto" src="img/14142354.jpg" alt="user">
+                    <div class="rig">
+                        <p>
+                            <span>证件号码：</span><span>333</span>
+                        </p>
+                        <p>
+                            <span>用户名：</span><span>222</span>
+                        </p>
+                        <p>
+                            <span>接待客服：</span><span>111</span>
+                        </p>
+                        <br>
+                        <button class="btn btn-default">旁听</button>
+                        <button class="btn btn-default btn-on">接入</button>
+                    </div>
+                </li>
+                <li class="col-md-5">
+                    <img class="userPoto" src="img/14142354.jpg" alt="user">
+                    <div class="rig">
+                        <p>
+                            <span>证件号码：</span><span>333</span>
+                        </p>
+                        <p>
+                            <span>用户名：</span><span>222</span>
+                        </p>
+                        <p>
+                            <span>接待客服：</span><span>111</span>
+                        </p>
+                        <br>
+                        <button class="btn btn-default">旁听</button>
+                        <button class="btn btn-default btn-on">接入</button>
+                    </div>
+                </li>
+                <li class="col-md-5">
+                    <img class="userPoto" src="img/14142354.jpg" alt="user">
+                    <div class="rig">
+                        <p>
+                            <span>证件号码：</span><span>333</span>
+                        </p>
+                        <p>
+                            <span>用户名：</span><span>222</span>
+                        </p>
+                        <p>
+                            <span>接待客服：</span><span>111</span>
+                        </p>
+                        <br>
+                        <button class="btn btn-default">旁听</button>
+                        <button class="btn btn-default btn-on">接入</button>
+                    </div>
+                </li>-->
+
+    </ul>
+
+    <button class="btn btn-default btn-on affix">客服接入</button>
+</div>
+
+
+<script type="text/javascript">
+    ServerAddr = '10.7.7.71';//anyChat视频连接
+    ServerPort = '8906';     //anyChat视频连接
+
+    http_ServerAddr = 'localhost';   //跨域地址
+    http_ServerPort = '3002';		//端口
+
+    currentSessionUserId = "00000000001";  //客服编号
+    currentSessionUserName = "admin";     //客服名称
+
+
+    //方法；//加载anyChat视频
+    // 参数
+    var scope = {};
+    scope.ServerAddr = ServerAddr;   //Constant.js引入的配置参数
+    scope.ServerPort = ServerPort;    //
+    scope.offerUser = {username: currentSessionUserId};//
+    loadAnyChat(scope);
+
+
+    var userBox = document.getElementById("userBox");
+
+    window.onload = function () {
+
+        var btnOn = document.getElementsByClassName("btn-on")[0];
+        btnOn.onclick = function () {
+            window.location = '/customer/';
+        }
+        $.ajax({
+            type: "POST",
+            url: "https://10.7.7.71:5002/api/getAudit",
+            dataType: "JSON",
+            crossDomain: true == !(document.all),
+            success: function (data) {
+                if (data['strAudit'].length > 0) {
+                    console.log(data['strAudit'])
+
+                    var users = data['strAudit'];
+                    //console.log(users);
+                    for (var i = 0; i < users.length; i++) {
+                        //console.log(users[i]);
+                        var userMessage = data['strAudit'][i].auditInfo;
+                        var Li = document.createElement('li');
+                        Li.i = i;
+                        Li.className = 'col-md-5'
+                        //console.log(userMessage.certId)
+                        //src="img/14142354.jpg"
+                        Li.innerHTML = '<img class="userPoto" src="{% static  'video/img/14142354.jpg'%}" alt="user">\
+                                <div class="rig">\
+                                <p>\
+                                <span>证件号码：</span><span>' + userMessage.certId + '</span>\
+                        </p>\
+                        <p>\
+                        <span>用户名：</span><span>' + userMessage.name + '</span>\
+                        </p>\
+                        <p>\
+                        <span>接待客服：</span><span>' + userMessage.userId + '</span>\
+                        </p>\
+                        <br>\
+                        <button class="btn btn-default btnt">旁听</button>\
+                                </div>';
+
+                        //<button class="btn btn-default btn-on">接入</button>\
+
+                        userBox.appendChild(Li);
+                        var btns = document.getElementsByClassName("btnt");
+//                        var btnOns = document.getElementsByClassName("btn-on");
+
+                        if (btns) {
+//                            console.log(btns);
+                            for (var j = 0; j < btns.length; j++) {
+                                btns[j].i = j;
+                                btns[j].onclick = function () {
+//                                    console.log(this.i);
+                                    if (this.ok){
+                                        this.innerHTML="旁听";
+                                        this.ok=false;
+                                        var userMess = data['strAudit'];
+                                        var user = userMess[this.i]['auditInfo'];
+
+                                        BRAC_LeaveRoom(user.roomId);
+                                    }else{
+                                        this.innerHTML="退出";
+                                        this.ok=true;
+                                        var userMess = data['strAudit'];
+                                        var user = userMess[this.i]['auditInfo'];
+
+                                        onVideoCallControlStart(1, user.mTargetUserId, user.mSelfUserId, user.roomId, '')
+                                    }
+
+                                }
+                            }
+
+                        }
+
+//                        if (btnOns){
+//                            for (var k = 0; k < btnOns.length; k++) {
+//                                btnOns[k].i = k;
+//                                btnOns[k].onclick = function () {
+//                                    //console.log(this.i);
+//                                    window.location='video_iframe.html';
+//                                }
+//                            }
+//                        }
+                    }
+                } else {
+                    userBox.innerHTML = '<div style="color: #e11114;font-size: 20px">暂无用户</div>'
+                    console.log("没有用户")
+                }
+            },
+            error: function (result) {
+                console.log(result);
+                userBox.innerHTML = '<div style="color: #e11114;">请使用IE10及以上版本浏览器</div>'
+            }
+        });
+
+
+    }
+
+
+</script>
+</body>
+</html>
+

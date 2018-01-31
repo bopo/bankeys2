@@ -1,0 +1,120 @@
+version: '2'
+
+volumes:
+   postgres_data: {}
+   postgres_backup: {}
+
+services:
+  postgres:
+    restart: always
+    build: ./docker/postgres
+    volumes:
+      - /srv/docker/postgres:/var/lib/postgresql:Z
+    env_file: env.docker
+
+  bankeys:
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+    user: django
+
+    depends_on:
+      - verifysign
+      - bankcard
+      - postgres
+      - redis
+    links:
+      - verifysign
+      - bankcard
+      - postgres
+      - redis
+#    volumes:
+#      - /srv/docker/bankeys/app:/app:Z
+    env_file: env.docker
+    command: /gunicorn.sh
+
+  nginx:
+    restart: always
+    build: ./docker/nginx
+    depends_on:
+      - bankeys
+    ports:
+      - "80:80"
+
+  redis:
+    restart: always
+    image: redis:alpine
+
+  celeryworker:
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+    user: django
+    env_file: env.docker
+    depends_on:
+     - postgres
+     - redis
+    links:
+      - postgres
+      - redis
+    command: celery -A config.celery worker -l INFO
+
+  celerybeat:
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+    user: django
+    env_file: env.docker
+    depends_on:
+      - postgres
+      - redis
+    links:
+      - postgres
+      - redis
+    command: celery -A config.celery beat -l INFO
+
+  celeryflower:
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+    user: django
+    ports:
+      - "0.0.0.0:5555:5555"
+    env_file: env.docker
+    depends_on:
+      - postgres
+      - redis
+    links:
+      - postgres
+      - redis
+    command: celery -A config.celery flower -l INFO
+
+  verifysign:
+    build:
+      context: .
+      dockerfile: ./docker/verify/Dockerfile
+    ports:
+      - "8080:8080"
+
+  bankcard:
+    build:
+      context: .
+      dockerfile: ./docker/bankcard/Dockerfile
+    ports:
+      - "5000:5000"
+
+  business:
+    build:
+      context: .
+      dockerfile: ./docker/business/Dockerfile
+    ports:
+      - "3000:3000"
+    env_file: env.docker
+
+  bankpays:
+    build:
+      context: .
+      dockerfile: ./docker/bankpays/Dockerfile
+    ports:
+      - "4000:4000"
+    command: /gunicorn.sh
